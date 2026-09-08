@@ -1,0 +1,33 @@
+name: Actualizar Base de Datos Xbox
+
+on:
+  schedule:
+    # Se ejecuta todos los lunes a las 00:00 UTC automáticamente
+    - cron: '0 0 * * 1'
+  workflow_dispatch: # Te permite ejecutarlo manualmente con un botón cuando quieras
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Ejecutar convertidor
+        run: python build_xbox_db.py
+
+      - name: Guardar cambios si hay codigos nuevos
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add xbox_codes.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update: Base de datos Xbox actualizada desde xboxresearch" && git push)

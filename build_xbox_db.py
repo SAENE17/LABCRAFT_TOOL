@@ -53,16 +53,21 @@ def main():
         final_desc = name if name else "POST CODE"
         final_cause = desc if desc else "Falla en etapa de arranque"
 
+        # Limpiar saltos de linea internos para mantener el JSON compacto en una linea por campo
+        final_desc = " ".join(final_desc.split())
+        final_cause = " ".join(final_cause.split())
+
         key = (clean_code, mask, final_desc)
         if key in seen:
             continue
         seen.add(key)
 
+        # Se amplía para no cortar diagnósticos técnicos detallados
         entries.append({
             "c": clean_code,
             "m": mask,
-            "d": final_desc[:31],
-            "r": final_cause[:47]
+            "d": final_desc[:95],
+            "r": final_cause[:250]
         })
 
     out_file = "xbox_codes.json"
